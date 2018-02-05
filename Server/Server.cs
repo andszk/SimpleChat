@@ -32,8 +32,10 @@ namespace Server
         {
             Server server = new Server();
             server.StartService();
-            Console.WriteLine(server.GetMessage());
-            Console.ReadKey();
+            while (true)
+            {
+                Console.WriteLine(server.GetMessage());
+            }
         }
 
         private void StartService()
