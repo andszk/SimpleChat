@@ -50,7 +50,9 @@ namespace Server
             NetworkStream = Client.GetStream();
             byte[] buffer = new byte[Client.ReceiveBufferSize];
             var bytes = NetworkStream.Read(buffer, 0, buffer.Length);
-            return Encoding.ASCII.GetString(buffer, 0, bytes);
+            return String.Format("{0} {1}",
+                DateTime.Now.ToString("HH:mm:ss"),
+                Encoding.ASCII.GetString(buffer, 0, bytes));
         }
     }
 }
