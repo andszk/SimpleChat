@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "SimpleChat\Client.csproj", "{E806E1B0-836B-41C5-9871-D420CCC63D4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{D69AAB98-0CE2-4DFD-B1DA-E3B9FCEA50A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleClient", "ConsoleClient\ConsoleClient.csproj", "{F69133B3-825C-43FA-86CF-7A9AB6781E13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E806E1B0-836B-41C5-9871-D420CCC63D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E806E1B0-836B-41C5-9871-D420CCC63D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E806E1B0-836B-41C5-9871-D420CCC63D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E806E1B0-836B-41C5-9871-D420CCC63D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D69AAB98-0CE2-4DFD-B1DA-E3B9FCEA50A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D69AAB98-0CE2-4DFD-B1DA-E3B9FCEA50A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D69AAB98-0CE2-4DFD-B1DA-E3B9FCEA50A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D69AAB98-0CE2-4DFD-B1DA-E3B9FCEA50A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F69133B3-825C-43FA-86CF-7A9AB6781E13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F69133B3-825C-43FA-86CF-7A9AB6781E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F69133B3-825C-43FA-86CF-7A9AB6781E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F69133B3-825C-43FA-86CF-7A9AB6781E13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C991AA5-BB91-4524-8C32-654BE62E992C}
+	EndGlobalSection
+EndGlobal
