@@ -1,58 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Server
 {
     class Server
     {
-        private String ip = "127.0.0.1";
-        private int port = 8888;
-        private NetworkStream networkStream;
-        private TcpClient client;
-        private TcpListener listener;
+        private static String ip = "127.0.0.1";
+        private static int port = 8888;
+        private List<TcpClient> clients = new List<TcpClient>();
 
+        public List<TcpClient> Clients { get => clients; set => clients = value; }
 
-        public string IP { get => ip; set => ip = value; }
-        public int Port { get => port; set => port = value; }
-        public NetworkStream NetworkStream { get => networkStream; set => networkStream = value; }
-        public TcpClient Client { get => client; set => client = value; }
-        public TcpListener Listener { get => listener; set => listener = value; }
-
-        ~Server()
-        {
-            Listener.Stop();
-            client.Close();
-        }
         static void Main(string[] args)
         {
-            Server server = new Server();
-            server.StartService();
+            Server s = new Server();
+            int threadCount = 10;
+            TcpListener listener = new TcpListener(IPAddress.Parse(ip), port);
+            listener.Start();
+
+            do
+            {
+                if (listener.Pending())
+                {
+                    TcpClient currentClient = listener.AcceptTcpClient();
+                    s.Clients.Add(currentClient);
+                    Thread thread = new Thread(() => s.Run(currentClient));
+                    thread.Start();
+                }
+            } while (s.Clients.Count <= threadCount);
+
+            listener.Stop();
+        }
+
+        public void Run(TcpClient client)
+        {
             while (true)
             {
-                Console.WriteLine(server.GetMessage());
+                NetworkStream networkStream = client.GetStream();
+                byte[] buffer = new byte[client.ReceiveBufferSize];
+                int bytes = networkStream.Read(buffer, 0, buffer.Length);
+                String message = Encoding.ASCII.GetString(buffer, 0, bytes);
+                string formattedMessage = String.Format("{0} {1}",
+                    DateTime.Now.ToString("HH:mm:ss"),
+                    message);
+
+                if (message != String.Empty)
+                {
+                    foreach (var c in clients)
+                        SendMessage(c, formattedMessage);
+                    Console.WriteLine(formattedMessage);
+                }
             }
         }
 
-        private void StartService()
+        private void SendMessage(TcpClient client, string message)
         {
-            Listener = new TcpListener(IPAddress.Parse(IP), port);
-            Listener.Start();
-            Client = listener.AcceptTcpClient();
+            //throw new NotImplementedException();
         }
 
-        public String GetMessage()
+        ~Server()
         {
-            NetworkStream = Client.GetStream();
-            byte[] buffer = new byte[Client.ReceiveBufferSize];
-            var bytes = NetworkStream.Read(buffer, 0, buffer.Length);
-            return String.Format("{0} {1}",
-                DateTime.Now.ToString("HH:mm:ss"),
-                Encoding.ASCII.GetString(buffer, 0, bytes));
+            foreach (var client in clients)
+                client.Close();
         }
     }
 }
