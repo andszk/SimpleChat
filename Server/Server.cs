@@ -59,7 +59,9 @@ namespace Server
 
         private void SendMessage(TcpClient client, string message)
         {
-            //throw new NotImplementedException();
+            byte[] bytes = Encoding.ASCII.GetBytes(message);
+            NetworkStream networkStream = client.GetStream();
+            networkStream.Write(bytes, 0, bytes.Length);
         }
 
         ~Server()
