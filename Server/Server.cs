@@ -18,6 +18,7 @@ namespace Server
         static void Main(string[] args)
         {
             Server s = new Server();
+
             int threadCount = 10;
             TcpListener listener = new TcpListener(IPAddress.Parse(ip), port);
             listener.Start();
