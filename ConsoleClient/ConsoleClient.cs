@@ -16,7 +16,7 @@ namespace ConsoleClient
 
             TcpClient server = new TcpClient(ip, port);
             NetworkStream networkStream = server.GetStream();
-            Thread thread = new Thread(() => client.Readmessage(server));
+            Thread thread = new Thread(() => client.ReadMessage(server));
             thread.Start();
             client.SendMessage(server, "Hello World!");
 
@@ -33,7 +33,7 @@ namespace ConsoleClient
             networkStream.Write(bytes, 0, bytes.Length);
         }
 
-        public void Readmessage(TcpClient client)
+        public void ReadMessage(TcpClient client)
         {
             while (true)
             {

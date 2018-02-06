@@ -45,7 +45,7 @@ namespace Server
                 byte[] buffer = new byte[client.ReceiveBufferSize];
                 int bytes = networkStream.Read(buffer, 0, buffer.Length);
                 String message = Encoding.ASCII.GetString(buffer, 0, bytes);
-                string formattedMessage = String.Format("{0} {1}",
+                string formattedMessage = String.Format("{0} {1}\n",
                     DateTime.Now.ToString("HH:mm:ss"),
                     message);
 
