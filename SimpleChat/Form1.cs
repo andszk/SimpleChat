@@ -33,6 +33,7 @@ namespace SimpleChat
 
         public void SendMessage(TcpClient server, String message)
         {
+            //TODO check if stream exists
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             NetworkStream networkStream = server.GetStream();
             networkStream.Write(bytes, 0, bytes.Length);
@@ -44,8 +45,10 @@ namespace SimpleChat
             {
                 NetworkStream networkStream = client.GetStream();
                 byte[] buffer = new byte[client.ReceiveBufferSize];
-                int bytes = networkStream.Read(buffer, 0, buffer.Length);
-                String message = Encoding.ASCII.GetString(buffer, 0, bytes);
+                int size = networkStream.Read(buffer, 0, buffer.Length);
+                if (buffer[0] == 0)
+                    continue;
+                String message = Encoding.ASCII.GetString(buffer, 0, size);
                 this.richTextThread = new Thread(() => AppendMessageThreadSafe(message));
                 this.richTextThread.Start();
             }
@@ -90,12 +93,10 @@ namespace SimpleChat
 
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
-            if (server.Connected)
-            {
-                readMessageThread.Abort();
-                server.Close();
-                this.splitContainer1.Panel2Collapsed = false;
-            }
+            readMessageThread.Abort();
+            server.GetStream().Close();
+            server.Close();
+            this.splitContainer1.Panel2Collapsed = false;
         }
     }
 }

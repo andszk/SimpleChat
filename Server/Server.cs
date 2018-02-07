@@ -32,6 +32,7 @@ namespace Server
                     Thread thread = new Thread(() => s.Run(currentClient));
                     thread.Start();
                 }
+                Thread.Sleep(10);
             } while (s.Clients.Count <= threadCount);
 
             Thread.CurrentThread.Join();
@@ -42,36 +43,40 @@ namespace Server
         public void Run(TcpClient client)
         {
             string name = ReadMessage(client);
-            SendMessage($"Hello {name}!\n");
+            SendMessage($"User {name} has connected!\n");
 
-            while (true)
+            while (IsConnected(client))
             {
                 string message = null;
 
                 try
                 {
-                    message = ReadMessage(client);
+                    if(client.GetStream().DataAvailable)
+                        message = ReadMessage(client);
                 }
-                catch (System.IO.IOException)
+                catch (ObjectDisposedException)
                 {
                     clients.Remove(client);
                     SendMessage($"{name} has been disconnected\n");
                     break;
                 }
 
-                string formattedMessage = $"({DateTime.Now.ToString("HH:mm:ss")}) {name}: {message}\n";
-
-                if (message != String.Empty)
+                if (message != null)
                 {
-                    foreach (var c in clients)
-                        SendMessage(c, formattedMessage);
-                    Console.WriteLine(formattedMessage);
+                    string formattedMessage = $"({DateTime.Now.ToString("HH:mm:ss")}) {name}: {message}\n";
+                    SendMessage(formattedMessage);
                 }
+
+                Thread.Sleep(10);
             }
+
+            clients.Remove(client);
+            SendMessage($"{name} has been disconnected\n");
         }
 
         private void SendMessage(string Message)
         {
+            Console.WriteLine(Message);
             foreach (var c in clients)
                 SendMessage(c, Message);
         }
@@ -87,9 +92,24 @@ namespace Server
         {
             NetworkStream networkStream = client.GetStream();
             byte[] buffer = new byte[client.ReceiveBufferSize];
-            int bytes = networkStream.Read(buffer, 0, buffer.Length);
-            String message = Encoding.ASCII.GetString(buffer, 0, bytes);
+            int size = networkStream.Read(buffer, 0, buffer.Length);
+            String message = Encoding.ASCII.GetString(buffer, 0, size);
             return message;
+        }
+
+        private bool IsConnected(TcpClient client)
+        {
+            try
+            {
+                byte[] bytes = new byte[1] { 0 };
+                client.GetStream().Write(bytes, 0, 1);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
 
         ~Server()
