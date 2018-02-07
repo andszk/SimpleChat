@@ -21,7 +21,16 @@ namespace Server
 
             int threadCount = 10;
             TcpListener listener = new TcpListener(IPAddress.Parse(ip), port);
-            listener.Start();
+
+            try
+            {
+                listener.Start();
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("Cannot connect to target socket. " + e.Message);
+            }
+
             bool firstClientConnected = false;
 
             while (s.Clients.Count <= threadCount)
@@ -42,7 +51,7 @@ namespace Server
             }
 
             listener.Stop();
-        }
+            }
 
         public void Run(TcpClient client)
         {
