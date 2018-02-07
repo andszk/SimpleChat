@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Net;
 
 namespace SimpleChat
 {
@@ -27,26 +28,18 @@ namespace SimpleChat
         {
             if (e.KeyChar == '\r')
             {
-                SendMessage(server, textBox1.Text);
-                textBox1.Clear();
+                SendMessage(server, textBoxMessage.Text);
+                textBoxMessage.Clear();
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            this.splitContainer1.Panel2Collapsed = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            String ip = "127.0.0.1";
-            int port = 8888;
-            this.server = new TcpClient(ip, port);
-            NetworkStream networkStream = server.GetStream();
-            SendMessage(server, "Hello World!");
-
-            Thread thread = new Thread(() => ReadMessage(server));
-            thread.Start();
         }
 
         public void SendMessage(TcpClient server, String message)
@@ -72,7 +65,7 @@ namespace SimpleChat
 
         private void AppendMessage(string text)
         {
-            if (this.textBox1.InvokeRequired)
+            if (this.textBoxMessage.InvokeRequired)
             {
                 StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(AppendMessage);
                 this.Invoke(d, new object[] { text });
@@ -84,5 +77,27 @@ namespace SimpleChat
         }
 
         delegate void StringArgReturningVoidDelegate(string text);
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.splitContainer1.Panel2Collapsed = true;
+            int port = 0;
+            try
+            {
+                IPAddress.Parse(textBoxIP.Text);
+                Int32.TryParse(textBoxPort.Text, out port);
+            }
+            catch (FormatException)
+            {
+                //TODO
+            }
+
+            this.server = new TcpClient(textBoxIP.Text, port);
+            NetworkStream networkStream = server.GetStream();
+            SendMessage(server, textBoxName.Text);
+
+            Thread thread = new Thread(() => ReadMessage(server));
+            thread.Start();
+        }
     }
 }
