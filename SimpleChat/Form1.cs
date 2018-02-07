@@ -12,13 +12,14 @@ namespace SimpleChat
         private TcpClient server;
         private Thread richTextThread = null;
         private Thread readMessageThread = null;
+        private bool connected = false;
 
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBoxMessage_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
             {
@@ -27,13 +28,8 @@ namespace SimpleChat
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-        }
-
         public void SendMessage(TcpClient server, String message)
         {
-            //TODO check if stream exists
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             NetworkStream networkStream = server.GetStream();
             networkStream.Write(bytes, 0, bytes.Length);
@@ -77,26 +73,37 @@ namespace SimpleChat
             {
                 IPAddress.Parse(textBoxIP.Text);
                 Int32.TryParse(textBoxPort.Text, out port);
+                this.server = new TcpClient(textBoxIP.Text, port);
             }
             catch (FormatException)
             {
-                //TODO
+                richTextBox1.AppendText("Wrong IP or Socket value, try again.");
+                return;
+            }
+            catch (SocketException ex)
+            {
+                richTextBox1.AppendText("Cannot connect to target server. " + ex.Message);
+                return;
             }
 
-            this.server = new TcpClient(textBoxIP.Text, port);
             NetworkStream networkStream = server.GetStream();
             SendMessage(server, textBoxName.Text);
 
             readMessageThread = new Thread(() => ReadMessage(server));
             readMessageThread.Start();
+            connected = true;
         }
 
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
-            readMessageThread.Abort();
-            server.GetStream().Close();
-            server.Close();
-            this.splitContainer1.Panel2Collapsed = false;
+            if (connected)
+            {
+                readMessageThread.Abort();
+                server.GetStream().Close();
+                server.Close();
+                this.splitContainer1.Panel2Collapsed = false;
+                connected = false;
+            }
         }
     }
 }

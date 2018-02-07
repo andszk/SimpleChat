@@ -22,20 +22,24 @@ namespace Server
             int threadCount = 10;
             TcpListener listener = new TcpListener(IPAddress.Parse(ip), port);
             listener.Start();
+            bool firstClientConnected = false;
 
-            do
+            while (s.Clients.Count <= threadCount)
             {
                 if (listener.Pending())
                 {
                     TcpClient currentClient = listener.AcceptTcpClient();
                     s.Clients.Add(currentClient);
+                    firstClientConnected = true;
                     Thread thread = new Thread(() => s.Run(currentClient));
                     thread.Start();
                 }
-                Thread.Sleep(10);
-            } while (s.Clients.Count <= threadCount);
 
-            Thread.CurrentThread.Join();
+                if (s.Clients.Count == 0 && firstClientConnected)
+                    break;
+
+                Thread.Sleep(10);
+            }
 
             listener.Stop();
         }
