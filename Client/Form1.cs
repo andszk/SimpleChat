@@ -105,5 +105,10 @@ namespace SimpleChat
                 connected = false;
             }
         }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            buttonDisconnect_Click(sender, e);
+        }
     }
 }
