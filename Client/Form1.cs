@@ -77,12 +77,16 @@ namespace SimpleChat
             }
             catch (FormatException)
             {
-                richTextBox1.AppendText("Wrong IP or Socket value, try again.");
+                richTextBox1.AppendText("Wrong IP or Socket value, try again.\n");
+                this.splitContainer1.Panel2Collapsed = false;
+                connected = false;
                 return;
             }
             catch (SocketException ex)
             {
                 richTextBox1.AppendText("Cannot connect to target server. " + ex.Message);
+                this.splitContainer1.Panel2Collapsed = false;
+                connected = false;
                 return;
             }
 
@@ -98,6 +102,7 @@ namespace SimpleChat
         {
             if (connected)
             {
+                richTextBox1.AppendText("You have been disconnected.\n");
                 readMessageThread.Abort();
                 server.GetStream().Close();
                 server.Close();
