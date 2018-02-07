@@ -34,20 +34,32 @@ namespace Server
                 }
             } while (s.Clients.Count <= threadCount);
 
+            Thread.CurrentThread.Join();
+
             listener.Stop();
         }
 
         public void Run(TcpClient client)
         {
+            string name = ReadMessage(client);
+            SendMessage($"Hello {name}!\n");
+
             while (true)
             {
-                NetworkStream networkStream = client.GetStream();
-                byte[] buffer = new byte[client.ReceiveBufferSize];
-                int bytes = networkStream.Read(buffer, 0, buffer.Length);
-                String message = Encoding.ASCII.GetString(buffer, 0, bytes);
-                string formattedMessage = String.Format("{0} {1}\n",
-                    DateTime.Now.ToString("HH:mm:ss"),
-                    message);
+                string message = null;
+
+                try
+                {
+                    message = ReadMessage(client);
+                }
+                catch (System.IO.IOException)
+                {
+                    clients.Remove(client);
+                    SendMessage($"{name} has been disconnected\n");
+                    break;
+                }
+
+                string formattedMessage = $"({DateTime.Now.ToString("HH:mm:ss")}) {name}: {message}\n";
 
                 if (message != String.Empty)
                 {
@@ -58,11 +70,26 @@ namespace Server
             }
         }
 
+        private void SendMessage(string Message)
+        {
+            foreach (var c in clients)
+                SendMessage(c, Message);
+        }
+
         private void SendMessage(TcpClient client, string message)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             NetworkStream networkStream = client.GetStream();
             networkStream.Write(bytes, 0, bytes.Length);
+        }
+
+        private string ReadMessage(TcpClient client)
+        {
+            NetworkStream networkStream = client.GetStream();
+            byte[] buffer = new byte[client.ReceiveBufferSize];
+            int bytes = networkStream.Read(buffer, 0, buffer.Length);
+            String message = Encoding.ASCII.GetString(buffer, 0, bytes);
+            return message;
         }
 
         ~Server()

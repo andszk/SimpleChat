@@ -69,7 +69,7 @@
             this.buttonDisconnect.TabIndex = 1;
             this.buttonDisconnect.Text = "Disconnect";
             this.buttonDisconnect.UseVisualStyleBackColor = true;
-            this.buttonDisconnect.Click += new System.EventHandler(this.button1_Click);
+            this.buttonDisconnect.Click += new System.EventHandler(this.buttonDisconnect_Click);
             // 
             // richTextBox1
             // 
@@ -127,7 +127,7 @@
             this.buttonConnect.TabIndex = 6;
             this.buttonConnect.Text = "Connect";
             this.buttonConnect.UseVisualStyleBackColor = true;
-            this.buttonConnect.Click += new System.EventHandler(this.button2_Click);
+            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
             // 
             // label3
             // 

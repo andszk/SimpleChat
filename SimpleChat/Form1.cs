@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Net;
+using System.Windows.Forms;
 
 namespace SimpleChat
 {
@@ -18,6 +11,7 @@ namespace SimpleChat
     {
         private TcpClient server;
         private Thread richTextThread = null;
+        private Thread readMessageThread = null;
 
         public Form1()
         {
@@ -31,11 +25,6 @@ namespace SimpleChat
                 SendMessage(server, textBoxMessage.Text);
                 textBoxMessage.Clear();
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            this.splitContainer1.Panel2Collapsed = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -57,17 +46,16 @@ namespace SimpleChat
                 byte[] buffer = new byte[client.ReceiveBufferSize];
                 int bytes = networkStream.Read(buffer, 0, buffer.Length);
                 String message = Encoding.ASCII.GetString(buffer, 0, bytes);
-                this.richTextThread = new Thread(() => AppendMessage(message));
+                this.richTextThread = new Thread(() => AppendMessageThreadSafe(message));
                 this.richTextThread.Start();
             }
         }
 
-
-        private void AppendMessage(string text)
+        private void AppendMessageThreadSafe(string text)
         {
             if (this.textBoxMessage.InvokeRequired)
             {
-                StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(AppendMessage);
+                StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(AppendMessageThreadSafe);
                 this.Invoke(d, new object[] { text });
             }
             else
@@ -78,7 +66,7 @@ namespace SimpleChat
 
         delegate void StringArgReturningVoidDelegate(string text);
 
-        private void button2_Click(object sender, EventArgs e)
+        private void buttonConnect_Click(object sender, EventArgs e)
         {
             this.splitContainer1.Panel2Collapsed = true;
             int port = 0;
@@ -96,8 +84,18 @@ namespace SimpleChat
             NetworkStream networkStream = server.GetStream();
             SendMessage(server, textBoxName.Text);
 
-            Thread thread = new Thread(() => ReadMessage(server));
-            thread.Start();
+            readMessageThread = new Thread(() => ReadMessage(server));
+            readMessageThread.Start();
+        }
+
+        private void buttonDisconnect_Click(object sender, EventArgs e)
+        {
+            if (server.Connected)
+            {
+                readMessageThread.Abort();
+                server.Close();
+                this.splitContainer1.Panel2Collapsed = false;
+            }
         }
     }
 }
