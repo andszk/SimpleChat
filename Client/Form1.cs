@@ -21,7 +21,7 @@ namespace SimpleChat
 
         private void textBoxMessage_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == '\r')
+            if (e.KeyChar == '\r' && connected)
             {
                 SendMessage(server, textBoxMessage.Text);
                 textBoxMessage.Clear();

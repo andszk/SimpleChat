@@ -19,7 +19,8 @@ namespace Server
         {
             Server s = new Server();
 
-            int threadCount = 10;
+            int maxClients = 10;
+            bool firstClientConnected = false;
             TcpListener listener = new TcpListener(IPAddress.Parse(ip), port);
 
             try
@@ -31,9 +32,7 @@ namespace Server
                 Console.WriteLine("Cannot connect to target socket. " + e.Message);
             }
 
-            bool firstClientConnected = false;
-
-            while (s.Clients.Count <= threadCount)
+            while (s.Clients.Count < maxClients)
             {
                 if (listener.Pending())
                 {
